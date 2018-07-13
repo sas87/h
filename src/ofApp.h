@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "ofMain.h"
 #include <random>
@@ -24,8 +24,13 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 
 private:
-	int base[4];
+	bool isRunning;
+	//実行中はtrue それ以外はfalse
+	int box[4];
+	//箱を定義
 	int time;
+	//実行してから1フレームごと1増える10000でループする変数です。
 	vector<ofVec2f> particle;
+	//粒子
 		
 };
