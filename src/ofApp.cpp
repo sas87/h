@@ -10,10 +10,10 @@ void ofApp::setup() {
 	box[1] = 50;     //y座標
 	box[2] = 512;  //x幅
 	box[3] = 512;    //y幅
-					 //512x512の箱を定義
+	//512x512の箱を定義
 
 	particle = vector<ofVec2f>(8000, ofVec2f(0, 0));
-	//粒子8192個の生成	  (0,0)で初期化
+	//粒子8000個の生成	  (0,0)で初期化
 	//粒子は二次元ベクトルクラス(ofVec2f)を使い、vectorでまとめて管理します
 }
 
@@ -42,7 +42,7 @@ void ofApp::update() {
 			 //乗算
 
 			 //int dtc = (x_d + y_d <= 100) ? dtc = 0 : dtc = 50;
-			 //定数
+			 //離散
 
 			 //ofVec3f nv(x + ofRandom(dtc)*cos(ofRandomf() * 1 * PI), y + ofRandom(dtc)*sin(ofRandomf() * 2 * PI));
 			 ofVec3f nv(x + ofRandom(-dtc, dtc), y + ofRandom(-dtc, dtc));
@@ -76,7 +76,7 @@ void ofApp::draw() {
 		int y_d = (y >= 0) ? (box[3] / 2) - y : (box[3] / 2) + y;
 		ofDrawBitmapString("dtc: " + ofToString((x_d + y_d)*0.2), box[0] + box[2] + 10, box[1] + 60);
 	}
-	
+	//文の描画
 
 	for (size_t i = 0; i < particle.size(); i++)
 	{
