@@ -35,10 +35,10 @@ void ofApp::update() {
 			 int y_d = (y >= 0) ? (box[3] / 2) - y : (box[3] / 2) + y;
 			 //最短の上下の壁の距離を測定
 
-			 //int dtc = (x_d + y_d)*0.8;
+			 int dtc = (x_d + y_d)*0.2;
 			 //加算
 
-			 int dtc = (x_d * y_d)*0.01;
+			 //int dtc = (x_d * y_d)*0.01;
 			 //乗算
 
 			 //int dtc = (x_d + y_d <= 100) ? dtc = 0 : dtc = 50;
@@ -67,8 +67,16 @@ void ofApp::draw() {
 	ofFill();
 	//箱の描画
 
-	ofDrawBitmapString("step: " + ofToString(time), 10, 30);
-	ofDrawBitmapString(ofToString(ofGetFrameRate()) + "fps", 10, 15);
+	ofDrawBitmapString(ofToString(ofGetFrameRate()) + "fps", box[0] + box[2] + 10, box[1]+15);
+	ofDrawBitmapString("step: " + ofToString(time), box[0] + box[2] + 10, box[1]+30);
+	{
+		int x = mouseX - box[0] - (box[2] / 2);
+		int y = mouseY - box[1] - (box[3] / 2);
+		int x_d = (x >= 0) ? (box[2] / 2) - x : (box[2] / 2) + x;
+		int y_d = (y >= 0) ? (box[3] / 2) - y : (box[3] / 2) + y;
+		ofDrawBitmapString("dtc: " + ofToString((x_d + y_d)*0.2), box[0] + box[2] + 10, box[1] + 60);
+	}
+	
 
 	for (size_t i = 0; i < particle.size(); i++)
 	{
