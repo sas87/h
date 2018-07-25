@@ -31,6 +31,19 @@ private:
 	int time;
 	//実行してから1フレームごと1増える10000でループする変数です。
 	vector<ofVec2f> particle;
+	vector<ofVec2f> ptcl0;
 	//粒子
+	int dtc(int x_d, int y_d);
+
+	ofVec2f toRelativeC(ofVec2f v);
+	void toRelativeC(int* vx,int* vy);
+	ofVec2f toAbsoluteC(ofVec2f &v);
+	void toAbsoluteC(int* vx, int* vy);
+
+	int toRelativeCx(int vx);
+	int toRelativeCy(int vy);
+	int toAbsoluteCx(int vx);
+	int toAbsoluteCy(int vy);
+	vector<ofVec4f> rigidBox;
 		
 };
