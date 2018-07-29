@@ -8,22 +8,24 @@ void ofApp::setup() {
 
 	box[0] = 50;     //x座標
 	box[1] = 50;     //y座標
-	box[2] = 512;  //x幅
+	box[2] = 512;    //x幅
 	box[3] = 512;    //y幅
 	//512x512の箱を定義
 
 	particle = vector<ofVec2f>(8000, ofVec2f(0, 0));
-	rigidBox = vector<ofVec4f>(1, ofVec4f(-180, -60, 100, 200));
-	rigidBox.push_back(ofVec4f(-50, -120, 150, 100));
 	//粒子8000個の生成	  (0,0)で初期化
 	//粒子は二次元ベクトルクラス(ofVec2f)を使い、vectorでまとめて管理します
+
+	rigidBox = vector<ofVec4f>();
+	rigidBox.push_back(ofVec4f(-50, -120, 150, 100));
+	rigidBox.push_back(ofVec4f(-180, -60, 100, 200));
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
 	time++;
 	if (time >= 10000)time = 0;
-	//if (time % 100 == 0)     //コマ落とししたいときに
+	if (time % 5 == 0)     //コマ落とししたいときに
 	{
 		if (isRunning)
 		{
@@ -39,21 +41,32 @@ void ofApp::update() {
 				//最短の上下の壁の距離を測定
 
 				int dtc = 50;
-				//int dtc = (x_d + y_d)*0.2;
-				//加算
-
-				//int dtc = ofApp::dtc(x_d,y_d);
-				//乗算
-
-				//int dtc = (x_d + y_d <= 100) ? dtc = 0 : dtc = 50;
-				//離散
 
 				//ofVec3f nv(x + ofRandom(dtc)*cos(ofRandomf() * 1 * PI), y + ofRandom(dtc)*sin(ofRandomf() * 2 * PI));
 				ofVec2f nv(x + ofRandom(-dtc, dtc), y + ofRandom(-dtc, dtc));
 				for (size_t i = 0; i < rigidBox.size(); i++)
 				{
 					if (((nv.x - rigidBox[i].x)*(nv.x - rigidBox[i].x - rigidBox[i].z) <= 0) &&
-						((nv.y - rigidBox[i].y)*(nv.y - rigidBox[i].y - rigidBox[i].w) <= 0)) { nv = { 0,0 }; }
+						((nv.y - rigidBox[i].y)*(nv.y - rigidBox[i].y - rigidBox[i].w) <= 0))
+					{
+						ofVec2f colliP;
+						if ((y - rigidBox[i].y)*(y - rigidBox[i].y - rigidBox[i].w) <= 0)
+						{
+							float rig = (y - rigidBox[i].y > 0) ? rigidBox[i].y + rigidBox[i].w : rigidBox[i].y;
+							colliP.x = rig;
+							colliP.y = (y*(rig - x) + nv.y*(nv.x - rig))*1.0f / (x - nv.y);
+						}
+						if ((nv.y - rigidBox[i].y)*(nv.y - rigidBox[i].y - rigidBox[i].w) <= 0)
+						{
+							float rig = (y - rigidBox[i].y > 0) ? rigidBox[i].y + rigidBox[i].w : rigidBox[i].y;
+							colliP.x = (y*(rig - x) + nv.y*(nv.x - rig))*1.0f / (x - nv.y);
+							colliP.y = rig;
+						}
+						nv = 0.5f*particle[i] + 0.5f*colliP;
+						//nv.x = ((nv.x - x) / 100.0f)*x + (1 - ((nv.x - x) / 100.0f))*((x - rigidBox[i].x > 0) ? rigidBox[i].x + rigidBox[i].z : rigidBox[i].x);
+						//nv.y = ((nv.y - y) / 100.0f)*y + (1 - ((nv.y - y) / 100.0f))*((y - rigidBox[i].y > 0) ? rigidBox[i].y + rigidBox[i].w : rigidBox[i].y);
+						//nv = { 0,0 }; 
+					}
 				}
 
 				if (abs(nv.x) > box[2] / 2)nv.x = (nv.x >= 0) ? box[2] - nv.x : -nv.x - box[2];
@@ -69,6 +82,14 @@ void ofApp::update() {
 int ofApp::dtc(int x_d,int y_d)
 {
 	int dtc = ((x_d + 0) * (y_d + 0))*0.001;
+	//int dtc = (x_d + y_d)*0.2;
+	//加算
+
+	//int dtc = ofApp::dtc(x_d,y_d);
+	//乗算
+
+	//int dtc = (x_d + y_d <= 100) ? dtc = 0 : dtc = 50;
+	//離散
 	return dtc;
 }
 ofVec2f ofApp::toRelativeC(ofVec2f v)
