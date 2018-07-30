@@ -25,7 +25,7 @@ void ofApp::setup() {
 void ofApp::update() {
 	time++;
 	if (time >= 10000)time = 0;
-	if (time % 5 == 0)     //コマ落とししたいときに
+	// (time % 5 == 0)     //コマ落とししたいときに
 	{
 		if (isRunning)
 		{
@@ -47,20 +47,82 @@ void ofApp::update() {
 				for (size_t i = 0; i < rigidBox.size(); i++)
 				{
 					if (((nv.x - rigidBox[i].x)*(nv.x - rigidBox[i].x - rigidBox[i].z) <= 0) &&
-						((nv.y - rigidBox[i].y)*(nv.y - rigidBox[i].y - rigidBox[i].w) <= 0))
+						((nv.y - rigidBox[i].y)*(nv.y - rigidBox[i].y - rigidBox[i].w) <= 0))//nvが障害物内に存在するとき
 					{
-						ofVec2f colliP;
-						if ((y - rigidBox[i].y)*(y - rigidBox[i].y - rigidBox[i].w) <= 0)
+						ofVec2f colliP; //現座標からnvへ直線を引いた時の境界線との交点
+						if ((y <= rigidBox[i].y && y >= rigidBox[i].y + rigidBox[i].w) && (x < rigidBox[i].x || x > rigidBox[i].x + rigidBox[i].z))//左右
 						{
-							float rig = (y - rigidBox[i].y > 0) ? rigidBox[i].y + rigidBox[i].w : rigidBox[i].y;
-							colliP.x = rig;
-							colliP.y = (y*(rig - x) + nv.y*(nv.x - rig))*1.0f / (x - nv.y);
+							colliP.x = (x - rigidBox[i].x > 0) ? rigidBox[i].x + rigidBox[i].z : rigidBox[i].x;				
+							colliP.y = (y*(x - colliP.x) + nv.y*(colliP.x - nv.x))*1.0f / (x - nv.y);
 						}
-						if ((nv.y - rigidBox[i].y)*(nv.y - rigidBox[i].y - rigidBox[i].w) <= 0)
+						else if ((x <= rigidBox[i].x&&x >= rigidBox[i].x + rigidBox[i].z) && (y < rigidBox[i].y || y > rigidBox[i].y + rigidBox[i].w))//上下
 						{
-							float rig = (y - rigidBox[i].y > 0) ? rigidBox[i].y + rigidBox[i].w : rigidBox[i].y;
-							colliP.x = (y*(rig - x) + nv.y*(nv.x - rig))*1.0f / (x - nv.y);
-							colliP.y = rig;
+							colliP.y= (y - rigidBox[i].y > 0) ? rigidBox[i].y + rigidBox[i].w : rigidBox[i].y;
+							colliP.x = (x*(y - colliP.y) + nv.x*(colliP.y - nv.y))*1.0f / (y - nv.y);
+						}
+						else if (x < rigidBox[i].x && y < rigidBox[i].y)//左上
+						{
+							ofVec2f cv = { rigidBox[i].x ,rigidBox[i].y };
+							float ktmk_C = (y - cv.y)*1.0f / (x - cv.x);
+							float ktmk_NV = (y - nv.y)*1.0f / (x - nv.x);
+							if (ktmk_C >= ktmk_NV) 
+							{
+								colliP.x = cv.x;
+								colliP.y = (y*(x - colliP.x) + nv.y*(colliP.x - nv.x))*1.0f / (x - nv.y);
+							}
+							else
+							{
+								colliP.y = cv.y;
+								colliP.x = (x*(y - colliP.y) + nv.x*(colliP.y - nv.y))*1.0f / (y - nv.y);
+							}
+						}
+						else if (x < rigidBox[i].x && y > rigidBox[i].y + rigidBox[i].w)//左下
+						{
+							ofVec2f cv = { rigidBox[i].x ,rigidBox[i].y + rigidBox[i].w };
+							float ktmk_C = (y - cv.y)*1.0f / (x - cv.x);
+							float ktmk_NV = (y - nv.y)*1.0f / (x - nv.x);
+							if (ktmk_C <= ktmk_NV)
+							{
+								colliP.x = cv.x;
+								colliP.y = (y*(x - colliP.x) + nv.y*(colliP.x - nv.x))*1.0f / (x - nv.y);
+							}
+							else
+							{
+								colliP.y = cv.y;
+								colliP.x = (x*(y - colliP.y) + nv.x*(colliP.y - nv.y))*1.0f / (y - nv.y);
+							}
+						}
+						else if (x > rigidBox[i].x + rigidBox[i].z && y > rigidBox[i].y + rigidBox[i].w)//右下
+						{
+							ofVec2f cv = { rigidBox[i].x + rigidBox[i].z ,rigidBox[i].y + rigidBox[i].w };
+							float ktmk_C = (y - cv.y)*1.0f / (x - cv.x);
+							float ktmk_NV = (y - nv.y)*1.0f / (x - nv.x);
+							if (ktmk_C >= ktmk_NV)
+							{
+								colliP.x = cv.x;
+								colliP.y = (y*(x - colliP.x) + nv.y*(colliP.x - nv.x))*1.0f / (x - nv.y);
+							}
+							else
+							{
+								colliP.y = cv.y;
+								colliP.x = (x*(y - colliP.y) + nv.x*(colliP.y - nv.y))*1.0f / (y - nv.y);
+							}
+						}
+						else if (x > rigidBox[i].x + rigidBox[i].z && y < rigidBox[i].y )//右上
+						{
+							ofVec2f cv = { rigidBox[i].x + rigidBox[i].z ,rigidBox[i].y};
+							float ktmk_C = (y - cv.y)*1.0f / (x - cv.x);
+							float ktmk_NV = (y - nv.y)*1.0f / (x - nv.x);
+							if (ktmk_C <= ktmk_NV)
+							{
+								colliP.x = cv.x;
+								colliP.y = (y*(x - colliP.x) + nv.y*(colliP.x - nv.x))*1.0f / (x - nv.y);
+							}
+							else
+							{
+								colliP.y = cv.y;
+								colliP.x = (x*(y - colliP.y) + nv.x*(colliP.y - nv.y))*1.0f / (y - nv.y);
+							}
 						}
 						nv = 0.5f*particle[i] + 0.5f*colliP;
 						//nv.x = ((nv.x - x) / 100.0f)*x + (1 - ((nv.x - x) / 100.0f))*((x - rigidBox[i].x > 0) ? rigidBox[i].x + rigidBox[i].z : rigidBox[i].x);
