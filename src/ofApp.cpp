@@ -1,4 +1,7 @@
 ﻿#include "ofApp.h"
+//https://github.com/sas87/h/blob/master/src/ofApp.cpp
+
+
 
 //--------------------------------------------------------------
 void ofApp::setup() {
@@ -29,8 +32,6 @@ void ofApp::update() {
 	{
 		if (isRunning)
 		{
-
-
 			for (size_t i = 0; i < particle.size(); i++)
 			{
 				int x = particle[i].x;
@@ -63,9 +64,9 @@ void ofApp::update() {
 						else if (x < rigidBox[i].x && y < rigidBox[i].y)//左上
 						{
 							ofVec2f cv = { rigidBox[i].x ,rigidBox[i].y };
-							float ktmk_C = (y - cv.y)*1.0f / (x - cv.x);
-							float ktmk_NV = (y - nv.y)*1.0f / (x - nv.x);
-							if (ktmk_C >= ktmk_NV) 
+							float slp_C = (y - cv.y)*1.0f / (x - cv.x);
+							float slp_NV = (y - nv.y)*1.0f / (x - nv.x);
+							if (slp_C >= slp_NV) 
 							{
 								colliP.x = cv.x;
 								colliP.y = (y*(x - colliP.x) + nv.y*(colliP.x - nv.x))*1.0f / (x - nv.y);
@@ -79,9 +80,9 @@ void ofApp::update() {
 						else if (x < rigidBox[i].x && y > rigidBox[i].y + rigidBox[i].w)//左下
 						{
 							ofVec2f cv = { rigidBox[i].x ,rigidBox[i].y + rigidBox[i].w };
-							float ktmk_C = (y - cv.y)*1.0f / (x - cv.x);
-							float ktmk_NV = (y - nv.y)*1.0f / (x - nv.x);
-							if (ktmk_C <= ktmk_NV)
+							float slp_C = (y - cv.y)*1.0f / (x - cv.x);
+							float slp_NV = (y - nv.y)*1.0f / (x - nv.x);
+							if (slp_C <= slp_NV)
 							{
 								colliP.x = cv.x;
 								colliP.y = (y*(x - colliP.x) + nv.y*(colliP.x - nv.x))*1.0f / (x - nv.y);
@@ -95,9 +96,9 @@ void ofApp::update() {
 						else if (x > rigidBox[i].x + rigidBox[i].z && y > rigidBox[i].y + rigidBox[i].w)//右下
 						{
 							ofVec2f cv = { rigidBox[i].x + rigidBox[i].z ,rigidBox[i].y + rigidBox[i].w };
-							float ktmk_C = (y - cv.y)*1.0f / (x - cv.x);
-							float ktmk_NV = (y - nv.y)*1.0f / (x - nv.x);
-							if (ktmk_C >= ktmk_NV)
+							float slp_C = (y - cv.y)*1.0f / (x - cv.x);
+							float slp_NV = (y - nv.y)*1.0f / (x - nv.x);
+							if (slp_C >= slp_NV)
 							{
 								colliP.x = cv.x;
 								colliP.y = (y*(x - colliP.x) + nv.y*(colliP.x - nv.x))*1.0f / (x - nv.y);
@@ -111,9 +112,9 @@ void ofApp::update() {
 						else if (x > rigidBox[i].x + rigidBox[i].z && y < rigidBox[i].y )//右上
 						{
 							ofVec2f cv = { rigidBox[i].x + rigidBox[i].z ,rigidBox[i].y};
-							float ktmk_C = (y - cv.y)*1.0f / (x - cv.x);
-							float ktmk_NV = (y - nv.y)*1.0f / (x - nv.x);
-							if (ktmk_C <= ktmk_NV)
+							float slp_C = (y - cv.y)*1.0f / (x - cv.x);
+							float slp_NV = (y - nv.y)*1.0f / (x - nv.x);
+							if (slp_C <= slp_NV)
 							{
 								colliP.x = cv.x;
 								colliP.y = (y*(x - colliP.x) + nv.y*(colliP.x - nv.x))*1.0f / (x - nv.y);
