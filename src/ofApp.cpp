@@ -7,7 +7,7 @@
 void ofApp::setup() {
 	isRunning = false;
 	time = 0;
-	ofBackground(255, 255, 255);
+	ofBackground(200, 200, 200);
 
 	box[0] = 50;     //x座標
 	box[1] = 50;     //y座標
@@ -20,11 +20,13 @@ void ofApp::setup() {
 	//粒子は二次元ベクトルクラス(ofVec2f)を使い、vectorでまとめて管理します
 
 	rigidBox = vector<ofVec4f>();
-	rigidBox.push_back(ofVec4f(-50, -120, 150, 100));
+	rigidBox.push_back(ofVec4f(100, 120, 500, 500));
 	rigidBox.push_back(ofVec4f(-180, -60, 100, 200));
 }
 
 //--------------------------------------------------------------
+
+bool isMouseTrk = false;
 void ofApp::update() {
 	time++;
 	if (time >= 10000)time = 0;
@@ -53,12 +55,12 @@ void ofApp::update() {
 						ofVec2f colliP; //現座標からnvへ直線を引いた時の境界線との交点
 						if ((y <= rigidBox[i].y && y >= rigidBox[i].y + rigidBox[i].w) && (x < rigidBox[i].x || x > rigidBox[i].x + rigidBox[i].z))//左右
 						{
-							colliP.x = (x - rigidBox[i].x > 0) ? rigidBox[i].x + rigidBox[i].z : rigidBox[i].x;				
+							colliP.x = (x - rigidBox[i].x > 0) ? rigidBox[i].x + rigidBox[i].z : rigidBox[i].x;
 							colliP.y = (y*(x - colliP.x) + nv.y*(colliP.x - nv.x))*1.0f / (x - nv.y);
 						}
 						else if ((x <= rigidBox[i].x&&x >= rigidBox[i].x + rigidBox[i].z) && (y < rigidBox[i].y || y > rigidBox[i].y + rigidBox[i].w))//上下
 						{
-							colliP.y= (y - rigidBox[i].y > 0) ? rigidBox[i].y + rigidBox[i].w : rigidBox[i].y;
+							colliP.y = (y - rigidBox[i].y > 0) ? rigidBox[i].y + rigidBox[i].w : rigidBox[i].y;
 							colliP.x = (x*(y - colliP.y) + nv.x*(colliP.y - nv.y))*1.0f / (y - nv.y);
 						}
 						else if (x < rigidBox[i].x && y < rigidBox[i].y)//左上
@@ -66,7 +68,7 @@ void ofApp::update() {
 							ofVec2f cv = { rigidBox[i].x ,rigidBox[i].y };
 							float slp_C = (y - cv.y)*1.0f / (x - cv.x);
 							float slp_NV = (y - nv.y)*1.0f / (x - nv.x);
-							if (slp_C >= slp_NV) 
+							if (slp_C >= slp_NV)
 							{
 								colliP.x = cv.x;
 								colliP.y = (y*(x - colliP.x) + nv.y*(colliP.x - nv.x))*1.0f / (x - nv.y);
@@ -109,9 +111,9 @@ void ofApp::update() {
 								colliP.x = (x*(y - colliP.y) + nv.x*(colliP.y - nv.y))*1.0f / (y - nv.y);
 							}
 						}
-						else if (x > rigidBox[i].x + rigidBox[i].z && y < rigidBox[i].y )//右上
+						else if (x > rigidBox[i].x + rigidBox[i].z && y < rigidBox[i].y)//右上
 						{
-							ofVec2f cv = { rigidBox[i].x + rigidBox[i].z ,rigidBox[i].y};
+							ofVec2f cv = { rigidBox[i].x + rigidBox[i].z ,rigidBox[i].y };
 							float slp_C = (y - cv.y)*1.0f / (x - cv.x);
 							float slp_NV = (y - nv.y)*1.0f / (x - nv.x);
 							if (slp_C <= slp_NV)
@@ -126,9 +128,6 @@ void ofApp::update() {
 							}
 						}
 						nv = 0.5f*particle[i] + 0.5f*colliP;
-						//nv.x = ((nv.x - x) / 100.0f)*x + (1 - ((nv.x - x) / 100.0f))*((x - rigidBox[i].x > 0) ? rigidBox[i].x + rigidBox[i].z : rigidBox[i].x);
-						//nv.y = ((nv.y - y) / 100.0f)*y + (1 - ((nv.y - y) / 100.0f))*((y - rigidBox[i].y > 0) ? rigidBox[i].y + rigidBox[i].w : rigidBox[i].y);
-						//nv = { 0,0 }; 
 					}
 				}
 
@@ -138,11 +137,18 @@ void ofApp::update() {
 
 				particle[i] = nv;
 			}
+
+
+		}
+		if (isMouseTrk) 
+		{
+			rigidBox[0].x = toRelativeCx(mouseX);
+			rigidBox[0].y = toRelativeCx(mouseY);
 		}
 	}
 
 }
-int ofApp::dtc(int x_d,int y_d)
+int ofApp::dtc(int x_d, int y_d)
 {
 	int dtc = ((x_d + 0) * (y_d + 0))*0.001;
 	//int dtc = (x_d + y_d)*0.2;
@@ -192,20 +198,22 @@ int ofApp::toAbsoluteCy(int vy)
 int p_size = 1;//粒子サイズ
 			   //--------------------------------------------------------------
 void ofApp::draw() {
-	ofSetColor(127, 127, 127);
-	ofNoFill();
+	ofSetColor(255, 255, 255);
+	//ofNoFill();
+	ofFill();
 	ofDrawRectangle(box[0], box[1], box[2], box[3]);
-
+	//
+	ofSetColor(200, 200, 200);
 	for (size_t i = 0; i < rigidBox.size(); i++)
 	{
-		ofDrawRectangle(toAbsoluteCx(rigidBox[i].x), toAbsoluteCy(rigidBox[i].y), rigidBox[i].z , rigidBox[i].w);
+		ofDrawRectangle(toAbsoluteCx(rigidBox[i].x), toAbsoluteCy(rigidBox[i].y), rigidBox[i].z, rigidBox[i].w);
 	}
 	ofSetColor(0, 0, 0);
-	ofFill();
+
 	//箱の描画
 
-	ofDrawBitmapString(ofToString(ofGetFrameRate()) + "fps", box[0] + box[2] + 10, box[1] + 15);
-	ofDrawBitmapString("step: " + ofToString(time), box[0] + box[2] + 10, box[1] + 30);
+	ofDrawBitmapString(ofToString(ofGetFrameRate()) + "fps", box[0] + box[2] + 50, box[1] + 15);
+	ofDrawBitmapString("step: " + ofToString(time), box[0] + box[2] + 50, box[1] + 30);
 	{
 		int x = mouseX;
 		int y = mouseY;
@@ -225,23 +233,23 @@ void ofApp::draw() {
 		ofDrawBitmapString(
 			(string)""
 			+ "isRunning: " + ofToString(isRunning) + "\r\n"
-			+ "mouse: ("+ ofToString(toRelativeCx(mouseX))+", "+ofToString(toRelativeCy(mouseY))+")"+"\r\n"
-			+"\r\n"
+			+ "mouse: (" + ofToString(toRelativeCx(mouseX)) + ", " + ofToString(toRelativeCy(mouseY)) + ")" + "\r\n"
+			+ "\r\n"
 			+ "dtc: " + ofToString(dtc) + "\r\n"
-			
+
 			+ "dtc: " + ofToString(dtc) + "\r\n"
 			+ "x_d: " + ofToString(x_d) + "\r\n"
 			+ "y_d: " + ofToString(y_d) + "\r\n"
 			+ "\r\n"
 			+ "mouseX: " + ofToString(x) + "\r\n"
 			+ "mouseX: " + ofToString(mouseX) + "\r\n"
-			+ "x_distance: " + ofToString((x - rigidBox[0].x)*(x - rigidBox[0].x - rigidBox[0].z )) + "\r\n"
+			+ "x_distance: " + ofToString((x - rigidBox[0].x)*(x - rigidBox[0].x - rigidBox[0].z)) + "\r\n"
 			+ "\r\n"
 			+ "\r\n"
 			+ "p[0]: ( " + ofToString(particle[0].x) + ", " + ofToString(particle[0].y) + " )" + "\r\n"
 
 			,
-			box[0] + box[2] + 10, box[1] + 60);
+			box[0] + box[2] + 50, box[1] + 60);
 	}
 	//文の描画
 
@@ -257,7 +265,7 @@ void ofApp::draw() {
 	{
 		int x = particle[0].x;
 		int y = particle[0].y;
-		
+
 		int x_d = (x >= 0) ? (box[2] / 2) - x : (box[2] / 2) + x;
 		int y_d = (y >= 0) ? (box[3] / 2) - y : (box[3] / 2) + y;
 		ofDrawCircle(toAbsoluteCx(x), toAbsoluteCy(y), dtc(x_d, y_d));
@@ -272,6 +280,8 @@ void ofApp::keyPressed(int key) {
 	if (key == 'a')ofApp::setup();
 	//"a"を押すとリスタートします
 
+	if (key == 'x')isMouseTrk = !isMouseTrk;
+	//"x"でマウストラックon/off
 }
 
 //--------------------------------------------------------------
