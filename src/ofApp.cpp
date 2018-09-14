@@ -15,13 +15,15 @@ void ofApp::setup() {
 	box[3] = 512;    //y幅
 	//512x512の箱を定義
 
-	particle = vector<ofVec2f>(8000, ofVec2f(100, 100));
+	particle = vector<ofVec2f>(12000, ofVec2f(100, 100));
 	//粒子8000個の生成	  (0,0)で初期化
 	//粒子は二次元ベクトルクラス(ofVec2f)を使い、vectorでまとめて管理します
 
 	rigidBox = vector<ofVec4f>();
-	//rigidBox.push_back(ofVec4f(100, 120, 500, 500));
+	
 	rigidBox.push_back(ofVec4f(-180, -60, 100, 200));
+	rigidBox.push_back(ofVec4f(0,-100, 100, 150));
+	rigidBox.push_back(ofVec4f(100, 120, 500, 500));
 }
 
 //--------------------------------------------------------------
@@ -40,12 +42,12 @@ void ofApp::update() {
 			{
 				float x = particle[i].x;
 				float y = particle[i].y;
-				/*
-				int x_d = (x >= 0) ? (box[2] / 2) - x : (box[2] / 2) + x;
-				int y_d = (y >= 0) ? (box[3] / 2) - y : (box[3] / 2) + y;*/
+				/**/
+				float x_d = (x >= 0) ? (box[2] / 2) - x : (box[2] / 2) + x;
+				float y_d = (y >= 0) ? (box[3] / 2) - y : (box[3] / 2) + y;
 				//最短の上下の壁の距離を測定
 
-				int dtc = 10;
+				float dtc = ofApp::dtc(x_d, y_d);
 
 				float r = ofRandomf()*dtc;
 				float th = ofRandomf();
@@ -292,7 +294,6 @@ void ofApp::draw() {
 
 
 	ofSetColor(0, 0, 0);
-	int dtc = 100;
 	for (size_t i = 0 + 1; i < particle.size(); i++)
 	{
 		ofDrawRectangle((int)toAbsoluteCx(particle[i].x - (p_size / 2)), (int)toAbsoluteCy(particle[i].y - (p_size / 2)), p_size, p_size);
@@ -310,7 +311,8 @@ void ofApp::draw() {
 
 		int x_d = (x >= 0) ? (box[2] / 2) - x : (box[2] / 2) + x;
 		int y_d = (y >= 0) ? (box[3] / 2) - y : (box[3] / 2) + y;
-		ofDrawCircle(toAbsoluteCx(x), toAbsoluteCy(y), 10);
+		int dtcc = ofApp::dtc(x_d, y_d);
+		ofDrawCircle(toAbsoluteCx(x), toAbsoluteCy(y), dtcc);
 	}
 
 }
