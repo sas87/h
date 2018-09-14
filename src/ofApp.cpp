@@ -38,22 +38,25 @@ void ofApp::update() {
 		{
 			for (size_t i = 0; i < particle.size(); i++)
 			{
-				int x = particle[i].x;
-				int y = particle[i].y;
+				float x = particle[i].x;
+				float y = particle[i].y;
 				/*
 				int x_d = (x >= 0) ? (box[2] / 2) - x : (box[2] / 2) + x;
 				int y_d = (y >= 0) ? (box[3] / 2) - y : (box[3] / 2) + y;*/
 				//最短の上下の壁の距離を測定
 
-				int dtc = 100;
+				int dtc = 10;
 
-				ofVec3f nv(ofRandom(dtc)*cos(ofRandomf() * 1 * PI), ofRandom(dtc)*sin(ofRandomf() * 2 * PI));//新しい座標候補
+				float r = ofRandomf()*dtc;
+				float th = ofRandomf();
+
+				ofVec3f nv(x + r * cos(th * 2 * PI), y + r * sin(th * 2 * PI));//新しい座標候補
 				//ofVec2f nv(x + ofRandom(-dtc, dtc), y + ofRandom(-dtc, dtc));
 				//dddddddddddddddddd
 				
 				//int i_r = 0;//debug
 				
-				if(false && rigidBox.size()>=1) for (size_t i_r = 0; i_r < rigidBox.size(); i_r++)
+				if(rigidBox.size()>=1) for (size_t i_r = 0; i_r < rigidBox.size(); i_r++)
 				{
 					if (i == 0)state = 10;
 					if (((nv.x - rigidBox[i_r].x)*(nv.x - rigidBox[i_r].x - rigidBox[i_r].z) <= 0) &&
@@ -161,8 +164,8 @@ void ofApp::update() {
 				}
 				
 
-				//if (abs(nv.x) > box[2] / 2)nv.x = (nv.x >= 0) ? box[2] - nv.x : -nv.x - box[2];
-				//if (abs(nv.y) > box[3] / 2)nv.y = (nv.y >= 0) ? box[3] - nv.y : -nv.y - box[3];
+				if (abs(nv.x) > box[2] / 2)nv.x = (nv.x >= 0) ? box[2] - nv.x : -nv.x - box[2];
+				if (abs(nv.y) > box[3] / 2)nv.y = (nv.y >= 0) ? box[3] - nv.y : -nv.y - box[3];
 				//はみ出し防止処理
 
 				particle[i] = nv;
@@ -292,10 +295,11 @@ void ofApp::draw() {
 	int dtc = 100;
 	for (size_t i = 0 + 1; i < particle.size(); i++)
 	{
-		//ofDrawRectangle(toAbsoluteCx(particle[i].x - (p_size / 2)), toAbsoluteCy(particle[i].y - (p_size / 2)), p_size, p_size);
+		ofDrawRectangle((int)toAbsoluteCx(particle[i].x - (p_size / 2)), (int)toAbsoluteCy(particle[i].y - (p_size / 2)), p_size, p_size);
+		/*
 		float r = ofRandom(0,dtc);
 		float th = ofRandomf();
-		ofDrawRectangle(toAbsoluteCx(1.0f*r*cos(th * 3.0f * PI)), toAbsoluteCy(1.0f*r*sin(th * 3.0f * PI)), p_size, p_size);
+		ofDrawRectangle(toAbsoluteCx(1.0f*r*cos(th * 3.0f * PI)+100), toAbsoluteCy(1.0f*r*sin(th * 3.0f * PI)), p_size, p_size);*/
 	}
 	ofSetColor(255, 0, 0);
 	ofDrawRectangle(toAbsoluteCx(particle[0].x - p_size), toAbsoluteCy(particle[0].y - p_size), p_size * 2, p_size * 2);
