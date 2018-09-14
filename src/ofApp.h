@@ -31,6 +31,7 @@ private:
 	int time;
 	//実行してから1フレームごと1増える10000でループする変数です。
 	vector<ofVec2f> particle;
+	vector<ofVec2f> particle0;
 	vector<ofVec2f> ptcl0;
 	//粒子
 	float dtc(float x_d, float y_d);

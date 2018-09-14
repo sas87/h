@@ -15,14 +15,15 @@ void ofApp::setup() {
 	box[3] = 512;    //y幅
 	//512x512の箱を定義
 
-	particle = vector<ofVec2f>(12000, ofVec2f(100, 100));
+	particle0 = vector<ofVec2f>(12000, ofVec2f(100, 100));
+	particle = particle0;
 	//粒子8000個の生成	  (0,0)で初期化
 	//粒子は二次元ベクトルクラス(ofVec2f)を使い、vectorでまとめて管理します
 
 	rigidBox = vector<ofVec4f>();
 	
 	rigidBox.push_back(ofVec4f(-180, -60, 100, 200));
-	rigidBox.push_back(ofVec4f(0,-100, 100, 150));
+	rigidBox.push_back(ofVec4f(50,-100, 100, 150));
 	rigidBox.push_back(ofVec4f(100, 120, 500, 500));
 }
 
@@ -321,9 +322,12 @@ void ofApp::draw() {
 void ofApp::keyPressed(int key) {
 	if (key == 'z')isRunning = !isRunning;
 	//"z"を押すと実行/一時停止します
-	if (key == 'a')ofApp::setup();
+	if (key == 'a') 
+	{
+		particle = particle0;
+		isRunning = !isRunning;
+	}
 	//"a"を押すとリスタートします
-
 	if (key == 'x')isMouseTrk = !isMouseTrk;
 	//"x"でマウストラックon/off
 	if (key == 's')statee = "ns: ";
