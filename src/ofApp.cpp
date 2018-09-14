@@ -51,118 +51,117 @@ void ofApp::update() {
 				float th = ofRandomf();
 
 				ofVec3f nv(x + r * cos(th * 2 * PI), y + r * sin(th * 2 * PI));//新しい座標候補
-				//ofVec2f nv(x + ofRandom(-dtc, dtc), y + ofRandom(-dtc, dtc));
-				//dddddddddddddddddd
-				
-				//int i_r = 0;//debug
-				
-				if(rigidBox.size()>=1) for (size_t i_r = 0; i_r < rigidBox.size(); i_r++)
-				{
-					if (i == 0)state = 10;
-					if (((nv.x - rigidBox[i_r].x)*(nv.x - rigidBox[i_r].x - rigidBox[i_r].z) <= 0) &&
-						((nv.y - rigidBox[i_r].y)*(nv.y - rigidBox[i_r].y - rigidBox[i_r].w) <= 0))//nvが障害物内に存在するとき
-					{					
-						//dddddddddddddd
-						if (i == 0) 
-						{
-							state = 20;
-						}
 
-						ofVec2f colliP; //現座標からnvへ直線を引いた時の境界線との交点
-						if ((y >= rigidBox[i_r].y && y <= rigidBox[i_r].y + rigidBox[i_r].w) && (x < rigidBox[i_r].x || x > rigidBox[i_r].x + rigidBox[i_r].z))//左右
-						{
-							//ddddd
-							if (i == 0)state += 1;
-							colliP.x = (x - rigidBox[i_r].x > 0) ? rigidBox[i_r].x + rigidBox[i_r].z : rigidBox[i_r].x;
-							colliP.y = (y*(x - colliP.x) + nv.y*(colliP.x - nv.x))*1.0f / (x - nv.y);
-						}
-						else if ((x >= rigidBox[i_r].x && x <= rigidBox[i_r].x + rigidBox[i_r].z) && (y < rigidBox[i_r].y || y > rigidBox[i_r].y + rigidBox[i_r].w))//上下
-						{
-							//ddddd
-							if (i == 0)state += 2;
-							colliP.y = (y - rigidBox[i_r].y > 0) ? rigidBox[i_r].y + rigidBox[i_r].w : rigidBox[i_r].y;
-							colliP.x = (x*(y - colliP.y) + nv.x*(colliP.y - nv.y))*1.0f / (y - nv.y);
-						}
-						else if (x < rigidBox[i_r].x && y < rigidBox[i_r].y)//左上
-						{
-							//ddddd
-							if (i == 0)state += 3;
-							/**/
-							ofVec2f cv = rigidBox[i_r];
-							float slp_C = (y - cv.y)*1.0f / (x - cv.x);
-							float slp_NV = (y - nv.y)*1.0f / (x - nv.x);
-							if (slp_C >= slp_NV)
-							{
-								colliP.x = cv.x;
-								colliP.y = (y*(x - colliP.x) + nv.y*(colliP.x - nv.x))*1.0f / (x - nv.y);
-							}
-							else
-							{
-								colliP.y = cv.y;
-								colliP.x = (x*(y - colliP.y) + nv.x*(colliP.y - nv.y))*1.0f / (y - nv.y);
-							}
-						}
-						else if (x < rigidBox[i_r].x && y > rigidBox[i_r].y + rigidBox[i_r].w)//左下
-						{
-							//ddddd
-							if (i == 0)state += 4;
-							/**/
-							ofVec2f cv = { rigidBox[i_r].x ,rigidBox[i_r].y + rigidBox[i_r].w };
-							float slp_C = (y - cv.y)*1.0f / (x - cv.x);
-							float slp_NV = (y - nv.y)*1.0f / (x - nv.x);
-							if (slp_C <= slp_NV)
-							{
-								colliP.x = cv.x;
-								colliP.y = (y*(x - colliP.x) + nv.y*(colliP.x - nv.x))*1.0f / (x - nv.y);
-							}
-							else
-							{
-								colliP.y = cv.y;
-								colliP.x = (x*(y - colliP.y) + nv.x*(colliP.y - nv.y))*1.0f / (y - nv.y);
-							}
-						}
-						else if (x > rigidBox[i_r].x + rigidBox[i_r].z && y > rigidBox[i_r].y + rigidBox[i_r].w)//右下
-						{
-							//ddddd
-							if (i == 0)state += 5;
-							/**/
-							ofVec2f cv = { rigidBox[i_r].x + rigidBox[i_r].z ,rigidBox[i_r].y + rigidBox[i_r].w };
-							float slp_C = (y - cv.y)*1.0f / (x - cv.x);
-							float slp_NV = (y - nv.y)*1.0f / (x - nv.x);
-							if (slp_C >= slp_NV)
-							{
-								colliP.x = cv.x;
-								colliP.y = (y*(x - colliP.x) + nv.y*(colliP.x - nv.x))*1.0f / (x - nv.y);
-							}
-							else
-							{
-								colliP.y = cv.y;
-								colliP.x = (x*(y - colliP.y) + nv.x*(colliP.y - nv.y))*1.0f / (y - nv.y);
-							}
-						}
-						else if (x > rigidBox[i_r].x + rigidBox[i_r].z && y < rigidBox[i_r].y)//右上
-						{
-							//ddddd
-							if (i == 0)state += 6;
-							/**/
-							ofVec2f cv = { rigidBox[i_r].x + rigidBox[i_r].z ,rigidBox[i_r].y };
-							float slp_C = (y - cv.y)*1.0f / (x - cv.x);
-							float slp_NV = (y - nv.y)*1.0f / (x - nv.x);
-							if (slp_C <= slp_NV)
-							{
-								colliP.x = cv.x;
-								colliP.y = (y*(x - colliP.x) + nv.y*(colliP.x - nv.x))*1.0f / (x - nv.y);
-							}
-							else
-							{
-								colliP.y = cv.y;
-								colliP.x = (x*(y - colliP.y) + nv.x*(colliP.y - nv.y))*1.0f / (y - nv.y);
-							}
-						}
-						nv = colliP;
-					}
-				}
 				
+				if (rigidBox.size() >= 1)
+					for (size_t i_r = 0; i_r < rigidBox.size(); i_r++)
+					{
+						if (i == 0)state = 10;
+
+						if (((nv.x - rigidBox[i_r].x)*(nv.x - rigidBox[i_r].x - rigidBox[i_r].z) <= 0) &&
+							((nv.y - rigidBox[i_r].y)*(nv.y - rigidBox[i_r].y - rigidBox[i_r].w) <= 0))//nvが障害物内に存在するとき
+						{
+							//dddddddddddddd
+							if (i == 0)
+							{
+								state = 20;
+							}
+
+							ofVec2f colliP; //現座標からnvへ直線を引いた時の境界線との交点
+							if ((y >= rigidBox[i_r].y && y <= rigidBox[i_r].y + rigidBox[i_r].w) && (x < rigidBox[i_r].x || x > rigidBox[i_r].x + rigidBox[i_r].z))//左右
+							{
+								//ddddd
+								if (i == 0)state += 1;
+								colliP.x = (x - rigidBox[i_r].x > 0) ? rigidBox[i_r].x + rigidBox[i_r].z+1 : rigidBox[i_r].x-1;
+								colliP.y = (y*(x - colliP.x) + nv.y*(colliP.x - nv.x))*1.0f / (x - nv.x);
+							}
+							else if ((x >= rigidBox[i_r].x && x <= rigidBox[i_r].x + rigidBox[i_r].z) && (y < rigidBox[i_r].y || y > rigidBox[i_r].y + rigidBox[i_r].w))//上下
+							{
+								//ddddd
+								if (i == 0)state += 2;
+								colliP.y = (y - rigidBox[i_r].y > 0) ? rigidBox[i_r].y + rigidBox[i_r].w+1 : rigidBox[i_r].y-1;
+								colliP.x = (x*(y - colliP.y) + nv.x*(colliP.y - nv.y))*1.0f / (y - nv.y);
+							}
+							else if (x < rigidBox[i_r].x && y < rigidBox[i_r].y)//左上
+							{
+								//ddddd
+								if (i == 0)state += 3;
+								/**/
+								ofVec2f cv = rigidBox[i_r];
+								float slp_C = (y - cv.y)*1.0f / (x - cv.x);
+								float slp_NV = (y - nv.y)*1.0f / (x - nv.x);
+								if (slp_C >= slp_NV)
+								{
+									colliP.x = cv.x;
+									colliP.y = (y*(x - colliP.x) + nv.y*(colliP.x - nv.x))*1.0f / (x - nv.x);
+								}
+								else
+								{
+									colliP.y = cv.y;
+									colliP.x = (x*(y - colliP.y) + nv.x*(colliP.y - nv.y))*1.0f / (y - nv.y);
+								}
+							}
+							else if (x < rigidBox[i_r].x && y > rigidBox[i_r].y + rigidBox[i_r].w)//左下
+							{
+								//ddddd
+								if (i == 0)state += 4;
+								/**/
+								ofVec2f cv = { rigidBox[i_r].x ,rigidBox[i_r].y + rigidBox[i_r].w };
+								float slp_C = (y - cv.y)*1.0f / (x - cv.x);
+								float slp_NV = (y - nv.y)*1.0f / (x - nv.x);
+								if (slp_C <= slp_NV)
+								{
+									colliP.x = cv.x;
+									colliP.y = (y*(x - colliP.x) + nv.y*(colliP.x - nv.x))*1.0f / (x - nv.x);
+								}
+								else
+								{
+									colliP.y = cv.y;
+									colliP.x = (x*(y - colliP.y) + nv.x*(colliP.y - nv.y))*1.0f / (y - nv.y);
+								}
+							}
+							else if (x > rigidBox[i_r].x + rigidBox[i_r].z && y > rigidBox[i_r].y + rigidBox[i_r].w)//右下
+							{
+								//ddddd
+								if (i == 0)state += 5;
+								/**/
+								ofVec2f cv = { rigidBox[i_r].x + rigidBox[i_r].z ,rigidBox[i_r].y + rigidBox[i_r].w };
+								float slp_C = (y - cv.y)*1.0f / (x - cv.x);
+								float slp_NV = (y - nv.y)*1.0f / (x - nv.x);
+								if (slp_C >= slp_NV)
+								{
+									colliP.x = cv.x;
+									colliP.y = (y*(x - colliP.x) + nv.y*(colliP.x - nv.x))*1.0f / (x - nv.x);
+								}
+								else
+								{
+									colliP.y = cv.y;
+									colliP.x = (x*(y - colliP.y) + nv.x*(colliP.y - nv.y))*1.0f / (y - nv.y);
+								}
+							}
+							else if (x > rigidBox[i_r].x + rigidBox[i_r].z && y < rigidBox[i_r].y)//右上
+							{
+								//ddddd
+								if (i == 0)state += 6;
+								/**/
+								ofVec2f cv = { rigidBox[i_r].x + rigidBox[i_r].z ,rigidBox[i_r].y };
+								float slp_C = (y - cv.y)*1.0f / (x - cv.x);
+								float slp_NV = (y - nv.y)*1.0f / (x - nv.x);
+								if (slp_C <= slp_NV)
+								{
+									colliP.x = cv.x;
+									colliP.y = (y*(x - colliP.x) + nv.y*(colliP.x - nv.x))*1.0f / (x - nv.x);
+								}
+								else
+								{
+									colliP.y = cv.y;
+									colliP.x = (x*(y - colliP.y) + nv.x*(colliP.y - nv.y))*1.0f / (y - nv.y);
+								}
+							}
+							nv = colliP;
+						}
+					}
+
 
 				if (abs(nv.x) > box[2] / 2)nv.x = (nv.x >= 0) ? box[2] - nv.x : -nv.x - box[2];
 				if (abs(nv.y) > box[3] / 2)nv.y = (nv.y >= 0) ? box[3] - nv.y : -nv.y - box[3];
@@ -171,7 +170,7 @@ void ofApp::update() {
 				particle[i] = nv;
 			}
 		}
-		if (isMouseTrk) 
+		if (isMouseTrk)
 		{
 			rigidBox[0].x = toRelativeCx(mouseX);
 			rigidBox[0].y = toRelativeCx(mouseY);
@@ -229,6 +228,7 @@ float ofApp::toAbsoluteCy(float vy)
 }
 int p_size = 1;//粒子サイズ
 int state_checker = 0;
+string statee = "s: ";
 //--------------------------------------------------------------
 void ofApp::draw() {
 	ofSetColor(255, 255, 255);
@@ -265,6 +265,7 @@ void ofApp::draw() {
 
 		if (isRunning && state != 10)
 		{
+			statee += ", \r\n" + ofToString(state);
 			state_checker++;
 		}
 		ofDrawBitmapString(
@@ -282,10 +283,9 @@ void ofApp::draw() {
 			+ "\r\n"
 			+ "\r\n"
 			+ "p[0]: ( " + ofToString(particle[0].x) + ", " + ofToString(particle[0].y) + " )" + "\r\n"
-			+ "state: " + ofToString(state) + "\r\n"
 			+ "stateC: " + ofToString(state_checker) + "\r\n"
-
-			,
+			+ statee + "\r\n",
+			
 			box[0] + box[2] + 50, box[1] + 60);
 	}
 	//文の描画
@@ -324,6 +324,7 @@ void ofApp::keyPressed(int key) {
 
 	if (key == 'x')isMouseTrk = !isMouseTrk;
 	//"x"でマウストラックon/off
+	if (key == 's')statee = "ns: ";
 }
 
 //--------------------------------------------------------------
