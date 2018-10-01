@@ -4,24 +4,23 @@
 #include <random>
 #include <math.h>
 
-class ofApp : public ofBaseApp{
+class ofApp : public ofBaseApp {
+public:
+	void setup();
+	void update();
+	void draw();
 
-	public:
-		void setup();
-		void update();
-		void draw();
-
-		void keyPressed(int key);
-		void keyReleased(int key);
-		void mouseMoved(int x, int y );
-		void mouseDragged(int x, int y, int button);
-		void mousePressed(int x, int y, int button);
-		void mouseReleased(int x, int y, int button);
-		void mouseEntered(int x, int y);
-		void mouseExited(int x, int y);
-		void windowResized(int w, int h);
-		void dragEvent(ofDragInfo dragInfo);
-		void gotMessage(ofMessage msg);
+	void keyPressed(int key);
+	void keyReleased(int key);
+	void mouseMoved(int x, int y);
+	void mouseDragged(int x, int y, int button);
+	void mousePressed(int x, int y, int button);
+	void mouseReleased(int x, int y, int button);
+	void mouseEntered(int x, int y);
+	void mouseExited(int x, int y);
+	void windowResized(int w, int h);
+	void dragEvent(ofDragInfo dragInfo);
+	void gotMessage(ofMessage msg);
 
 private:
 	bool isRunning;
@@ -31,20 +30,20 @@ private:
 	int time;
 	//実行してから1フレームごと1増える10000でループする変数です。
 	vector<ofVec2f> particle;
-	vector<ofVec2f> particle0;
+	int particle0;
 	vector<ofVec2f> ptcl0;
 	//粒子
-	float dtc(float x_d, float y_d);
+	ofVec2f p_ptc;
+	float dtc(ofVec2f p);
 
-	ofVec2f toRelativeC(ofVec2f v);
-	void toRelativeC(float* vx, float* vy);
-	ofVec2f toAbsoluteC(ofVec2f &v);
-	void toAbsoluteC(float* vx, float* vy);
+	ofVec2f toRc(ofVec2f* v);
+	void toRc(float* vx, float* vy);
+	ofVec2f toAc(ofVec2f &v);
+	void toAc(float* vx, float* vy);
 
-	float toRelativeCx(float vx);
-	float toRelativeCy(float vy);
-	float toAbsoluteCx(float vx);
-	float toAbsoluteCy(float vy);
+	float toRx(float vx);
+	float toRy(float vy);
+	float toAx(float vx);
+	float toAy(float vy);
 	vector<ofVec4f> rigidBox;
-		
 };
