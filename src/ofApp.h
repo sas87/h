@@ -46,4 +46,5 @@ private:
 	float toAx(float vx);
 	float toAy(float vy);
 	vector<ofVec4f> rigidBox;
+	ofVec2f window_;
 };

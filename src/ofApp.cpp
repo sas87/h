@@ -9,12 +9,14 @@ void ofApp::setup() {
 
 	box[0] = 50;     //x座標
 	box[1] = 50;     //y座標
-	box[2] = 512;    //x幅
-	box[3] = 512;    //y幅
+	box[2] = ofGetWindowHeight() - 200;    //x幅
+	box[3] = box[2];    //y幅
 	//512x512の箱を定義
 	p_ptc = { 100,100 };
 	particle0 = 12000;
 	particle = vector<ofVec2f>(particle0, p_ptc);
+
+	window_ = { (float)ofGetWindowWidth(),(float)ofGetWindowHeight() };
 
 	//粒子8000個の生成	  (0,0)で初期化
 	//粒子は二次元ベクトルクラス(ofVec2f)を使い、vectorでまとめて管理します
@@ -161,8 +163,8 @@ void ofApp::update() {
 						}
 					}
 
-				if (abs(nv.x) > box[2] / 2)nv.x = (nv.x >= 0) ? box[2] - nv.x : -nv.x - box[2];
-				if (abs(nv.y) > box[3] / 2)nv.y = (nv.y >= 0) ? box[3] - nv.y : -nv.y - box[3];
+				if (abs(nv.x) >= box[2] / 2.0f)nv.x = (nv.x >= 0) ? box[2] : -box[2];
+				if (abs(nv.y) >= box[3] / 2.0f)nv.y = (nv.y >= 0) ? box[3] : -box[3];
 				//はみ出し防止処理
 
 				particle[i] = nv;
@@ -216,7 +218,7 @@ float ofApp::toRx(float vx)
 }
 float ofApp::toRy(float vy)
 {
-	return vy - box[1] - (box[3] * 1.0f / 2);;
+	return vy - box[1] - (box[3] * 1.0f / 2);
 }
 float ofApp::toAx(float vx)
 {
@@ -224,7 +226,7 @@ float ofApp::toAx(float vx)
 }
 float ofApp::toAy(float vy)
 {
-	return vy + box[0] + (box[2] * 1.0f / 2);
+	return vy + box[0] + (box[3] * 1.0f / 2);
 }
 int p_size = 1;//粒子サイズ
 int state_checker = 0;
@@ -243,35 +245,6 @@ void ofApp::draw() {
 	}
 
 	//箱の描画
-	{
-		ofDrawBitmapString(ofToString(ofGetFrameRate()) + "fps", box[0] + box[2] + 50, box[1] + 15);
-		ofDrawBitmapString("step: " + ofToString(time), box[0] + box[2] + 50, box[1] + 30);
-
-		float x = mouseX;
-		float y = mouseY;
-		toRc(&x, &y);
-
-		if (isRunning && state != 10)
-		{
-			statee += ", \r\n" + ofToString(state);
-			state_checker++;
-		}
-		ofDrawBitmapString(
-			(string)""
-			+ "isRunning: " + ofToString(isRunning) + "\r\n"
-			+ "mouse: (" + ofToString(toRx(mouseX)) + ", " + ofToString(toRy(mouseY)) + ")" + "\r\n"
-			+ "\r\n"
-			+ "\r\n"
-			+ "x_d: " + ofToString((x - rigidBox[0].x)*(x - rigidBox[0].x - rigidBox[0].z)) + "\r\n"
-			+ "\r\n"
-			+ "\r\n"
-			+ "p[0]: ( " + ofToString(particle[0].x) + ", " + ofToString(particle[0].y) + " )" + "\r\n"
-			+ "staC: " + ofToString(state_checker) + "\r\n"
-			+ statee + "\r\n",
-
-			box[0] + box[2] + 50, box[1] + 60);
-	}
-	//文の描画
 
 	ofSetColor(0, 0, 0);
 	for (size_t i = 0 + 1; i < particle.size(); i++)
@@ -299,6 +272,36 @@ void ofApp::draw() {
 	ofFill();
 	ofDrawCircle(toAx(p_ptc.x), toAy(p_ptc.y), 5);
 	ofSetColor(0, 0, 0);
+
+	{
+		ofDrawBitmapString(ofToString(ofGetFrameRate()) + "fps", box[0] + box[2] + 50, box[1] + 15);
+		ofDrawBitmapString("step: " + ofToString(time), box[0] + box[2] + 50, box[1] + 30);
+
+		float x = mouseX;
+		float y = mouseY;
+		toRc(&x, &y);
+
+		if (isRunning && state != 10)
+		{
+			statee += ", \r\n" + ofToString(state);
+			state_checker++;
+		}
+
+		ofDrawBitmapString(
+			(string)""
+			+ "isRunning: " + ofToString(isRunning) + "\r\n"
+			+ "mouse: (" + ofToString(toRx(mouseX)) + ", " + ofToString(toRy(mouseY)) + ")" + "\r\n"
+			+ "\r\n"
+			+ "\r\n"
+			+ "x_d: " + ofToString((x - rigidBox[0].x)*(x - rigidBox[0].x - rigidBox[0].z)) + "\r\n"
+			+ "\r\n"
+			+ "\r\n"
+			+ "p[0]: ( " + ofToString(particle[0].x) + ", " + ofToString(particle[0].y) + " )" + "\r\n"
+			+ "staC: " + ofToString(state_checker) + "\r\n"
+			+ statee + "\r\n",
+			box[0] + box[2] + 50, box[1] + 60);
+	}
+	//文の描画
 }
 
 //--------------------------------------------------------------
@@ -356,6 +359,20 @@ void ofApp::mouseExited(int x, int y) {
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h) {
+	float k = ((float)h *1.0f / window_.y);
+	box[2] *= k;    //x幅
+	box[3] *= k;    //y幅
+
+	for (size_t i = 0 + 1; i < particle.size(); i++)
+	{
+		particle[i] *= k;
+	}
+	for (size_t i_r = 0; i_r < rigidBox.size(); i_r++)
+	{
+		rigidBox[i_r] *= k;
+	}
+
+	window_ = { (float)w,(float)h };
 }
 
 //--------------------------------------------------------------
