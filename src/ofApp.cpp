@@ -9,12 +9,17 @@ void ofApp::setup() {
 
 	box[0] = 50;     //x座標
 	box[1] = 50;     //y座標
-	box[2] = ofGetWindowHeight() - 200;    //x幅
+	box[2] = 512;    //x幅
 	box[3] = box[2];    //y幅
 	//512x512の箱を定義
 	p_ptc = { 100,100 };
-	particle0 = 12000;
+	particle0 = 15000;
 	particle = vector<ofVec2f>(particle0, p_ptc);
+	for (size_t i = 0; i < particle.size(); i++)
+	{
+		particle[i] = { ofRandomf()*box[2] / 2.0f - 1, ofRandomf()*box[3] / 2.0f - 1 };
+	}
+	dnst = vector<vector<int>>(32, vector<int>(32, 0));
 
 	window_ = { (float)ofGetWindowWidth(),(float)ofGetWindowHeight() };
 
@@ -23,9 +28,9 @@ void ofApp::setup() {
 
 	rigidBox = vector<ofVec4f>();
 
-	rigidBox.push_back(ofVec4f(-180, -60, 100, 200));
-	rigidBox.push_back(ofVec4f(50, -100, 100, 150));
-	rigidBox.push_back(ofVec4f(100, 120, 500, 500));
+	rigidBox.push_back(ofVec4f(10, 10, 0, 0));
+	//rigidBox.push_back(ofVec4f(50, -100, 100, 150));
+	//rigidBox.push_back(ofVec4f(100, 120, 500, 500));
 }
 
 //--------------------------------------------------------------
@@ -40,6 +45,14 @@ void ofApp::update() {
 	{
 		if (isRunning)
 		{
+			for (size_t i = 0; i < dnst.size(); i++)
+			{
+				for (size_t j = 0; j < dnst[0].size(); j++)
+				{
+					dnst[i][j] = 0;
+				}
+			}
+
 			for (size_t i = 0; i < particle.size(); i++)
 			{
 				float x = particle[i].x;
@@ -49,10 +62,13 @@ void ofApp::update() {
 
 				float dtc = ofApp::dtc(particle[i]);
 
-				float r = ofRandomf()*dtc;
-				float th = ofRandomf();
+				//float r = ofRandomf()*dtc;
+				//float th = ofRandomf();
+				//ofVec3f nv(x + r * cos(th * 2 * PI), y + r * sin(th * 2 * PI));
+				//新しい座標候補:円
 
-				ofVec3f nv(x + r * cos(th * 2 * PI), y + r * sin(th * 2 * PI));//新しい座標候補
+				ofVec3f nv(x + ofRandomf()*dtc, y + ofRandomf()*dtc);
+				//新しい座標候補:格子
 
 				if (rigidBox.size() >= 1)
 					for (size_t i_r = 0; i_r < rigidBox.size(); i_r++)
@@ -162,12 +178,26 @@ void ofApp::update() {
 							nv = colliP;
 						}
 					}
+				//障害物に対する当たり判定と処理
 
-				if (abs(nv.x) >= box[2] / 2.0f)nv.x = (nv.x >= 0) ? box[2] : -box[2];
-				if (abs(nv.y) >= box[3] / 2.0f)nv.y = (nv.y >= 0) ? box[3] : -box[3];
-				//はみ出し防止処理
+				if (abs(nv.x) >= box[2] / 2.0f)nv.x = (nv.x >= 0) ? box[2] / 2.0f - 1 : -box[2] / 2.0f + 1;
+				if (abs(nv.y) >= box[3] / 2.0f)nv.y = (nv.y >= 0) ? box[3] / 2.0f - 1 : -box[3] / 2.0f + 1;
+				//はみ出し判定と処理
 
 				particle[i] = nv;
+
+				nv.x = nv.x + box[2] / 2.0f;
+				nv.y = nv.y + box[3] / 2.0f;
+
+				int address_x = floor(nv.x*dnst.size() * 1.0f / box[2]);
+				if (address_x < 0)address_x = 0;
+				if (address_x > dnst.size() - 1)address_x = dnst.size() - 1;
+
+				int address_y = floor(nv.y*dnst[0].size() * 1.0f / box[3]);
+				if (address_y < 0)address_y = 0;
+				if (address_y > dnst[0].size() - 1)address_y = dnst[0].size() - 1;
+
+				dnst[address_x][address_y]++;
 			}
 		}
 		if (isMouseTrk)
@@ -182,7 +212,19 @@ float ofApp::dtc(ofVec2f p)
 	float x_d = (p.x >= 0) ? (box[2] / 2) - p.x : (box[2] / 2) + p.x;
 	float y_d = (p.y >= 0) ? (box[3] / 2) - p.y : (box[3] / 2) + p.y;
 
-	float dtc = ((x_d + 0) * (y_d + 0))*0.001;
+	//float dtc = ((x_d + 0) * (y_d + 0))*0.001;
+	float dtc = 15.0f;
+
+	ofVec2f nv = ofVec2f(p.x + box[2] / 2.0f, p.y + box[3] / 2.0f);
+	int address_x = floor(nv.x*dnst.size() * 1.0f / box[2]);
+	if (address_x < 0)address_x = 0;
+	if (address_x > dnst.size() - 1)address_x = dnst.size() - 1;
+
+	int address_y = floor(nv.y*dnst[0].size() * 1.0f / box[3]);
+	if (address_y < 0)address_y = 0;
+	if (address_y > dnst[0].size() - 1)address_y = dnst[0].size() - 1;
+
+	dtc = dtc * 1.0f / (1 + dnst[address_x][address_y]);
 	//int dtc = (x_d + y_d)*0.2;
 	//加算
 
@@ -238,6 +280,7 @@ void ofApp::draw() {
 	ofFill();
 	ofDrawRectangle(box[0], box[1], box[2], box[3]);
 	//
+
 	ofSetColor(200, 200, 200);
 	for (size_t i_r = 0; i_r < rigidBox.size(); i_r++)
 	{
@@ -245,6 +288,20 @@ void ofApp::draw() {
 	}
 
 	//箱の描画
+	{
+		float width = box[2] * 1.0f / dnst.size();
+		float height = box[3] * 1.0f / dnst[0].size();
+
+		for (size_t i = 0; i < dnst.size(); i++)
+		{
+			for (size_t j = 0; j < dnst[0].size(); j++)
+			{
+				ofSetColor(250 - 1 * dnst[i][j], 250 - 1 * dnst[i][j], 250 - 1 * dnst[i][j]);
+				ofDrawRectangle(toAx(i*width - box[2] / 2.0f), toAx(j*height - box[3] / 2.0f), width, height);
+			}
+		}
+		//濃度
+	}
 
 	ofSetColor(0, 0, 0);
 	for (size_t i = 0 + 1; i < particle.size(); i++)
@@ -265,6 +322,7 @@ void ofApp::draw() {
 		int dtcc = ofApp::dtc(particle[0]);
 		ofDrawCircle(toAx(x), toAy(y), dtcc);
 	}
+	//粒子関連の描画
 
 	ofSetColor(233, 152, 206);
 	ofNoFill();
@@ -301,7 +359,7 @@ void ofApp::draw() {
 			+ statee + "\r\n",
 			box[0] + box[2] + 50, box[1] + 60);
 	}
-	//文の描画
+	//文字の描画
 }
 
 //--------------------------------------------------------------
@@ -310,7 +368,11 @@ void ofApp::keyPressed(int key) {
 	//"z"を押すと実行/一時停止します
 	if (key == 'a')
 	{
-		particle = vector<ofVec2f>(particle0, p_ptc);
+		//particle = vector<ofVec2f>(particle0, p_ptc);
+		for (size_t i = 0; i < particle.size(); i++)
+		{
+			particle[i] = { ofRandomf()*box[2] / 2.0f - 1, ofRandomf()*box[3] / 2.0f - 1 };
+		}
 		isRunning = false;
 	}
 	//"a"を押すとリスタートします
@@ -359,6 +421,7 @@ void ofApp::mouseExited(int x, int y) {
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h) {
+	/*
 	float k = ((float)h *1.0f / window_.y);
 	box[2] *= k;    //x幅
 	box[3] *= k;    //y幅
@@ -372,7 +435,7 @@ void ofApp::windowResized(int w, int h) {
 		rigidBox[i_r] *= k;
 	}
 
-	window_ = { (float)w,(float)h };
+	window_ = { (float)w,(float)h };*/
 }
 
 //--------------------------------------------------------------
