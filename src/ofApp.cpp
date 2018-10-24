@@ -19,7 +19,7 @@ void ofApp::setup() {
 	{
 		particle[i] = { ofRandomf()*box[2] / 2.0f - 1, ofRandomf()*box[3] / 2.0f - 1 };
 	}
-	dnst = vector<vector<int>>(32, vector<int>(32, 0));
+	dnst = vector<vector<int>>(64, vector<int>(64, 0));
 
 	window_ = { (float)ofGetWindowWidth(),(float)ofGetWindowHeight() };
 
@@ -28,9 +28,9 @@ void ofApp::setup() {
 
 	rigidBox = vector<ofVec4f>();
 
-	rigidBox.push_back(ofVec4f(10, 10, 0, 0));
-	//rigidBox.push_back(ofVec4f(50, -100, 100, 150));
-	//rigidBox.push_back(ofVec4f(100, 120, 500, 500));
+	rigidBox.push_back(ofVec4f(-200, -100, 100, 800));
+	rigidBox.push_back(ofVec4f(50, -100, 100, 150));
+	rigidBox.push_back(ofVec4f(100, 120, 500, 500));
 }
 
 //--------------------------------------------------------------
@@ -45,6 +45,14 @@ void ofApp::update() {
 	{
 		if (isRunning)
 		{
+			for (size_t i = 0; i < rigidBox.size(); i++)
+			{
+				rigidBox[i].x = rigidBox[i].x - ((int)rigidBox[i].x % (box[2] / dnst.size()));
+				rigidBox[i].y = rigidBox[i].y - ((int)rigidBox[i].y % (box[3] / dnst[0].size()));
+				rigidBox[i].z = rigidBox[i].z - ((int)rigidBox[i].z % (box[2] / dnst.size()));
+				rigidBox[i].w = rigidBox[i].w - ((int)rigidBox[i].w % (box[3] / dnst[0].size()));
+			}
+
 			for (size_t i = 0; i < dnst.size(); i++)
 			{
 				for (size_t j = 0; j < dnst[0].size(); j++)
@@ -180,24 +188,26 @@ void ofApp::update() {
 					}
 				//障害物に対する当たり判定と処理
 
-				if (abs(nv.x) >= box[2] / 2.0f)nv.x = (nv.x >= 0) ? box[2] / 2.0f - 1 : -box[2] / 2.0f + 1;
-				if (abs(nv.y) >= box[3] / 2.0f)nv.y = (nv.y >= 0) ? box[3] / 2.0f - 1 : -box[3] / 2.0f + 1;
+				if (abs(nv.x) > box[2] / 2.0f)nv.x = (nv.x >= 0) ? box[2] / 2.0f : -box[2] / 2.0f;
+				if (abs(nv.y) > box[3] / 2.0f)nv.y = (nv.y >= 0) ? box[3] / 2.0f : -box[3] / 2.0f;
 				//はみ出し判定と処理
 
+				if (nv.x == 0 && nv.y == 0)nv = { ofRandomf()*box[2] / 2.0f, ofRandomf()*box[3] / 2.0f };
 				particle[i] = nv;
+				{
+					nv.x = nv.x + box[2] / 2.0f;
+					nv.y = nv.y + box[3] / 2.0f;
 
-				nv.x = nv.x + box[2] / 2.0f;
-				nv.y = nv.y + box[3] / 2.0f;
+					int address_x = floor(nv.x*dnst.size() * 1.0f / box[2]);
+					if (address_x < 0)address_x = 0;
+					if (address_x > dnst.size() - 1)address_x = dnst.size() - 1;
 
-				int address_x = floor(nv.x*dnst.size() * 1.0f / box[2]);
-				if (address_x < 0)address_x = 0;
-				if (address_x > dnst.size() - 1)address_x = dnst.size() - 1;
+					int address_y = floor(nv.y*dnst[0].size() * 1.0f / box[3]);
+					if (address_y < 0)address_y = 0;
+					if (address_y > dnst[0].size() - 1)address_y = dnst[0].size() - 1;
 
-				int address_y = floor(nv.y*dnst[0].size() * 1.0f / box[3]);
-				if (address_y < 0)address_y = 0;
-				if (address_y > dnst[0].size() - 1)address_y = dnst[0].size() - 1;
-
-				dnst[address_x][address_y]++;
+					dnst[address_x][address_y]++;
+				}
 			}
 		}
 		if (isMouseTrk)
@@ -213,7 +223,7 @@ float ofApp::dtc(ofVec2f p)
 	float y_d = (p.y >= 0) ? (box[3] / 2) - p.y : (box[3] / 2) + p.y;
 
 	//float dtc = ((x_d + 0) * (y_d + 0))*0.001;
-	float dtc = 15.0f;
+	float dtc = 20.0f;
 
 	ofVec2f nv = ofVec2f(p.x + box[2] / 2.0f, p.y + box[3] / 2.0f);
 	int address_x = floor(nv.x*dnst.size() * 1.0f / box[2]);
@@ -281,13 +291,8 @@ void ofApp::draw() {
 	ofDrawRectangle(box[0], box[1], box[2], box[3]);
 	//
 
-	ofSetColor(200, 200, 200);
-	for (size_t i_r = 0; i_r < rigidBox.size(); i_r++)
-	{
-		ofDrawRectangle(toAx(rigidBox[i_r].x), toAy(rigidBox[i_r].y), rigidBox[i_r].z, rigidBox[i_r].w);
-	}
-
 	//箱の描画
+	/**/
 	{
 		float width = box[2] * 1.0f / dnst.size();
 		float height = box[3] * 1.0f / dnst[0].size();
@@ -296,11 +301,17 @@ void ofApp::draw() {
 		{
 			for (size_t j = 0; j < dnst[0].size(); j++)
 			{
-				ofSetColor(250 - 1 * dnst[i][j], 250 - 1 * dnst[i][j], 250 - 1 * dnst[i][j]);
+				ofSetColor(250 - 3 * dnst[i][j], 250 - 3 * dnst[i][j], 250 - 3 * dnst[i][j]);
 				ofDrawRectangle(toAx(i*width - box[2] / 2.0f), toAx(j*height - box[3] / 2.0f), width, height);
 			}
 		}
 		//濃度
+	}
+
+	ofSetColor(200, 200, 200);
+	for (size_t i_r = 0; i_r < rigidBox.size(); i_r++)
+	{
+		ofDrawRectangle(toAx(rigidBox[i_r].x), toAy(rigidBox[i_r].y), rigidBox[i_r].z, rigidBox[i_r].w);
 	}
 
 	ofSetColor(0, 0, 0);
@@ -373,6 +384,7 @@ void ofApp::keyPressed(int key) {
 		{
 			particle[i] = { ofRandomf()*box[2] / 2.0f - 1, ofRandomf()*box[3] / 2.0f - 1 };
 		}
+		dnst = vector<vector<int>>(32, vector<int>(32, 0));
 		isRunning = false;
 	}
 	//"a"を押すとリスタートします
