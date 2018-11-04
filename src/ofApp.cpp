@@ -23,7 +23,7 @@ void ofApp::setup() {
 
 	rigidBox = vector<ofVec4f>();
 
-	rigidBox.push_back(ofVec4f(-180, -60, 100, 200));
+	rigidBox.push_back(ofVec4f(-200, -100, 100, 800));
 	rigidBox.push_back(ofVec4f(50, -100, 100, 150));
 	rigidBox.push_back(ofVec4f(100, 120, 500, 500));
 }
