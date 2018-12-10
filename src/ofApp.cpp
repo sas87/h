@@ -223,7 +223,7 @@ float ofApp::dtc(ofVec2f p)
 	float y_d = (p.y >= 0) ? (box[3] / 2) - p.y : (box[3] / 2) + p.y;
 
 	//float dtc = ((x_d + 0) * (y_d + 0))*0.001;
-	float dtc = 15.0f;
+	float dtc = 30.0f;
 
 	ofVec2f nv = ofVec2f(p.x + box[2] / 2.0f, p.y + box[3] / 2.0f);
 	int address_x = floor(nv.x*dnst.size() * 1.0f / box[2]);
