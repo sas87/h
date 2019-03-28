@@ -1,5 +1,4 @@
 ﻿#include "ofApp.h"
-//https://github.com/sas87/h/blob/master/src/ofApp.cpp
 
 //--------------------------------------------------------------
 void ofApp::setup() {
